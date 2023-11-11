@@ -50,6 +50,28 @@ veterinarianSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+/* ----------------------------------------------------------------- */
+/* ----- Metodos adicionales que le queramos agregar al Schema ----- */
+/* ----------------------------------------------------------------- */
+// Method #1: Check Password
+veterinarianSchema.methods.checkPassword = async function (passwordForm) {
+  return await bcrypt.compare(passwordForm, this.password); // return boolean
+};
+
+// Method #2: Quitar propiedades cuando llamamos la funcion .json() al momento de enviar el objeto al frontend. Por ejemplo: No queremos que el frontend vea el password hasheado asi que lo quitamos.
+/* The `veterinarianSchema.methods.toJSON` function is a method that is added to the schema to modify
+the behavior of the `toJSON` function when called on a veterinarian object. */
+veterinarianSchema.methods.toJSON = function () {
+  // Desestructuramos lo que no queremos que se envíe al frontend
+  const { __v, password, _id, ...restObject } = this.toObject();
+
+  // Creamos una propiedad id y le asignamos el valor de _id.
+  restObject.id = _id;
+
+  // Se devuelven el objeto con el resto de las propiedades.
+  return restObject;
+};
+
 const Veterinarian = mongoose.model('Veterinarian', veterinarianSchema);
 
 export default Veterinarian;

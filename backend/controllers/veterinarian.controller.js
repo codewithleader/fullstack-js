@@ -1,4 +1,5 @@
 import Veterinarian from '../models/Veterinarian.model.js';
+import generateJWT from '../helpers/generateJWT.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -29,7 +30,8 @@ const register = async (req, res) => {
 };
 
 const profile = (req, res) => {
-  res.json({ msg: 'Mostrando perfil' });
+  const { session } = req;
+  res.json({ session });
 };
 
 const verify = async (req, res) => {
@@ -58,4 +60,36 @@ const verify = async (req, res) => {
   }
 };
 
-export { register, profile, verify };
+const authenticate = async (req, res) => {
+  const { email, password } = req.body;
+
+  // Comprobar se el usuario existe
+  const user = await Veterinarian.findOne({ email });
+
+  if (!user) {
+    const error = new Error('Usuario no existe');
+    return res.status(403).json({ msg: error.message });
+  }
+
+  if (!user.verified) {
+    const error = new Error('Tu cuenta no ha sido confirmada');
+    return res.status(403).json({ msg: error.message });
+  }
+
+  if (!(await user.checkPassword(password))) {
+    const error = new Error('Contraseña incorrecta');
+    return res.status(403).json({ msg: error.message });
+  }
+
+  const jwt = generateJWT({ id: user.id });
+
+  return res.json({ msg: 'OK', jwt, user });
+};
+
+const resetPassword = (req, res) => {
+
+};
+
+const newPassword = () => {};
+
+export { authenticate, register, profile, verify, resetPassword, newPassword };
