@@ -16,6 +16,6 @@ export const PATH_API = {
     verify: '/confirmar/:token', // Dynamic QueryParam
     login: '/login',
     reset_password: '/reset-password',
-    new_password: '/new-password:token',
+    new_password: '/new-password/:token', // Dynamic QueryParam
   },
 };
