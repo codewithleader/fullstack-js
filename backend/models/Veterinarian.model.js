@@ -37,6 +37,9 @@ const veterinarianSchema = mongoose.Schema({
   },
 });
 
+/* ----------------------------------------------------------------- */
+/* ----- Metodos adicionales que le queramos agregar al Schema ----- */
+/* ----------------------------------------------------------------- */
 // Realizar acciones antes de guardar en DB (Por ejemplo: Hashear el password):
 veterinarianSchema.pre('save', async function (next) {
   // ? Nota Importante: No se puede usar arrow function en este caso porque se usará "this" y this hace referencia al ventana global window en un arrow function, mientras que en una funcion tradicional "this" representa el objeto actual. Mosca con los arrow functions.
@@ -47,12 +50,9 @@ veterinarianSchema.pre('save', async function (next) {
   }
 
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password, salt); // Es preferible hash que hashSync para no bloquear la app.
 });
 
-/* ----------------------------------------------------------------- */
-/* ----- Metodos adicionales que le queramos agregar al Schema ----- */
-/* ----------------------------------------------------------------- */
 // Method #1: Check Password
 veterinarianSchema.methods.checkPassword = async function (passwordForm) {
   return await bcrypt.compare(passwordForm, this.password); // return boolean
@@ -72,6 +72,7 @@ veterinarianSchema.methods.toJSON = function () {
   return restObject;
 };
 
+// El nombre que está en el primer argumento del metodo .model() entre comillas simples es el nombre del modelo para las referencias (ref)
 const Veterinarian = mongoose.model('Veterinarian', veterinarianSchema);
 
 export default Veterinarian;

@@ -24,9 +24,10 @@ const register = async (req, res) => {
     const veterinarianSaved = await veterinarian.save();
 
     res.json({ msg: 'Veterinario Registrado', veterinarianSaved });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: 'Error, contactar a administrador' });
+  } catch (err) {
+    console.error(err);
+    const error = new Error('contacte al administrador');
+    return res.status(500).json({ msg: error.message });
   }
 };
 
@@ -53,11 +54,10 @@ const verify = async (req, res) => {
     const userVerified = await userToVerify.save();
 
     res.json({ msg: 'Usuario Verificado Exitosamente', userVerified });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      msg: 'Error: Contacte al administrador',
-    });
+  } catch (err) {
+    console.error(err);
+    const error = new Error('contacte al administrador');
+    return res.status(500).json({ msg: error.message });
   }
 };
 
