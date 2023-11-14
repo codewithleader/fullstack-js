@@ -1,8 +1,47 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Alert from '../components/Alert';
+import clientAxios from '../config/axios';
 
 const Login = () => {
   const [isDisabled, setIsDisabled] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [alert, setAlert] = useState({});
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setAlert({});
+    setIsDisabled(true);
+
+    if ([email.trim(), password.trim()].includes('')) {
+      setAlert({ message: 'Email y Contraseña son requeridos', error: true });
+      setIsDisabled(false);
+      return;
+    }
+
+    // Falta verificar expresion regular de EMAIL
+    try {
+      const { data } = await clientAxios.post('/veterinarios/login', {
+        email,
+        password,
+      });
+      const { token } = data;
+
+      // Guardar token en localStorage
+      localStorage.setItem('token', token);
+
+      navigate('/admin')
+    } catch (error) {
+      setAlert({ message: error.response.data.msg, error: true });
+      setIsDisabled(false);
+    }
+  };
+
+  const { message } = alert;
+
   return (
     <>
       <div>
@@ -12,7 +51,8 @@ const Login = () => {
         </h1>
       </div>
       <div className='mt-20 md:mt-0 shadow-lg px-7 py-10 rounded-xl bg-white'>
-        <form action=''>
+        {message ? <Alert alert={alert} /> : null}
+        <form onSubmit={handleSubmit}>
           <div className='my-5'>
             <label className='uppercase text-gray-600 block text-xl font-bold'>
               Email
@@ -21,6 +61,8 @@ const Login = () => {
               type='email'
               placeholder='Email Registrado'
               className='border w-full p-3 mt-3 bg-gray-50 rounded-xl'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className='my-5'>
@@ -31,6 +73,8 @@ const Login = () => {
               type='password'
               placeholder='Tu contraseña'
               className='border w-full p-3 mt-3 bg-gray-50 rounded-xl'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 

@@ -1,6 +1,8 @@
 import Veterinarian from '../models/Veterinarian.model.js';
 import generateJWT from '../helpers/generateJWT.js';
 import generateToken from '../helpers/generateToken.js';
+import emailRegister from '../helpers/emailRegister.js';
+import emailResetPassword from '../helpers/emailResetPassword.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -22,6 +24,14 @@ const register = async (req, res) => {
     // Crear un nuevo veterinario
     const veterinarian = new Veterinarian(req.body);
     const veterinarianSaved = await veterinarian.save();
+
+    // Enviar email
+    await emailRegister({
+      email,
+      name,
+      token: veterinarianSaved.token,
+      hostFrontend: req.get('Origin') || req.get('Referer'), // ? Obtiene el host de origen de la petición, por ejemplo 'http://localhost:3000' Es indispensable para enviar el email con el path correcto
+    });
 
     res.json({ msg: 'Veterinario Registrado', veterinarianSaved });
   } catch (err) {
@@ -53,7 +63,7 @@ const verify = async (req, res) => {
     userToVerify.verified = true;
     const userVerified = await userToVerify.save();
 
-    res.json({ msg: 'Usuario Verificado Exitosamente', userVerified });
+    return res.json({ msg: 'Usuario Verificado Exitosamente', userVerified });
   } catch (err) {
     console.error(err);
     const error = new Error('contacte al administrador');
@@ -82,9 +92,9 @@ const authenticate = async (req, res) => {
     return res.status(403).json({ msg: error.message });
   }
 
-  const jwt = generateJWT({ id: user.id });
+  const token = generateJWT({ id: user.id });
 
-  return res.json({ msg: 'OK', jwt, user });
+  return res.json({ msg: 'OK', token, user });
 };
 
 const resetPassword = async (req, res) => {
@@ -100,6 +110,15 @@ const resetPassword = async (req, res) => {
   try {
     isUserExists.token = generateToken();
     await isUserExists.save();
+
+    // Enviar email
+    await emailResetPassword({
+      email,
+      name: isUserExists.name,
+      token: isUserExists.token,
+      hostFrontend: req.get('Origin') || req.get('Referer'), // ? Obtiene el host de origen de la petición, por ejemplo 'http://localhost:3000' Es indispensable para enviar el email con el path correcto
+    });
+
     return res.json({ msg: 'Hemos enviado un EMAIL con las instrucciones' });
   } catch (err) {
     console.error(err);
