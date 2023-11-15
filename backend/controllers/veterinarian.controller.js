@@ -43,7 +43,7 @@ const register = async (req, res) => {
 
 const profile = (req, res) => {
   const { session } = req;
-  res.json({ session });
+  res.json({ user: session.user });
 };
 
 const verify = async (req, res) => {
@@ -92,9 +92,9 @@ const authenticate = async (req, res) => {
     return res.status(403).json({ msg: error.message });
   }
 
-  const token = generateJWT({ id: user.id });
+  user.token = generateJWT({ id: user.id });
 
-  return res.json({ msg: 'OK', token, user });
+  return res.json({ user });
 };
 
 const resetPassword = async (req, res) => {

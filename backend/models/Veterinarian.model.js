@@ -63,7 +63,7 @@ veterinarianSchema.methods.checkPassword = async function (passwordForm) {
 the behavior of the `toJSON` function when called on a veterinarian object. */
 veterinarianSchema.methods.toJSON = function () {
   // Desestructuramos lo que no queremos que se envíe al frontend
-  const { __v, password, _id, ...restObject } = this.toObject();
+  const { __v, password, _id, verified, ...restObject } = this.toObject();
 
   // Creamos una propiedad id y le asignamos el valor de _id.
   restObject.id = _id;

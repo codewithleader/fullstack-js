@@ -8,20 +8,27 @@ const ProtectedRoutesLayout = () => {
   const { auth, loading } = useAuth();
 
   if (loading) {
-    return 'Cargando...';
+    return (
+      <div className='spinner'>
+        <div className='double-bounce1'></div>
+        <div className='double-bounce2'></div>
+      </div>
+    );
   }
 
   return (
     <>
-      <Header />
-      {auth?.user?.id ? (
-        <main className='container mx-auto mt-10'>
-          <Outlet />
-        </main>
+      {auth?.id ? (
+        <>
+          <Header />
+          <main className='container mx-auto mt-10'>
+            <Outlet />
+          </main>
+          <Footer />
+        </>
       ) : (
         <Navigate to='/' />
       )}
-      <Footer />
     </>
   );
 };

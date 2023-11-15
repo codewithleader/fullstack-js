@@ -26,10 +26,10 @@ const AuthProvider = ({ children }) => {
 
       try {
         const {
-          data: { session },
+          data: { user },
         } = await clientAxios('/veterinarios/perfil', config);
 
-        setAuth(session);
+        setAuth(user);
       } catch (error) {
         console.error(error.response.data.msg);
         setAuth({});
@@ -41,12 +41,18 @@ const AuthProvider = ({ children }) => {
     authenticateUser();
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setAuth({});
+  };
+
   return (
     <AuthContext.Provider
       value={{
         auth,
         setAuth,
         loading,
+        logout,
       }}
     >
       {children}

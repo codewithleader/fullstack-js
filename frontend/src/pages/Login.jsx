@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Alert from '../components/Alert';
 import clientAxios from '../config/axios';
+import useAuth from '../hooks/useAuth';
+import Alert from '../components/Alert';
 
 const Login = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alert, setAlert] = useState({});
+
+  const { setAuth } = useAuth();
 
   const navigate = useNavigate();
 
@@ -24,16 +27,19 @@ const Login = () => {
 
     // Falta verificar expresion regular de EMAIL
     try {
-      const { data } = await clientAxios.post('/veterinarios/login', {
+      const {
+        data: { user },
+      } = await clientAxios.post('/veterinarios/login', {
         email,
         password,
       });
-      const { token } = data;
 
       // Guardar token en localStorage
-      localStorage.setItem('token', token);
+      localStorage.setItem('token', user.token);
 
-      navigate('/admin')
+      setAuth(user);
+
+      navigate('/admin');
     } catch (error) {
       setAlert({ message: error.response.data.msg, error: true });
       setIsDisabled(false);
