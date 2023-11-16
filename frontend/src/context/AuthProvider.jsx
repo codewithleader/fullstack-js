@@ -4,7 +4,7 @@ import clientAxios from '../config/axios';
 const AuthContext = createContext();
 
 // eslint-disable-next-line react/prop-types
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState({});
 
@@ -13,6 +13,7 @@ const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
 
       if (!token) {
+        setAuth({});
         setLoading(false);
         return;
       }
@@ -29,7 +30,7 @@ const AuthProvider = ({ children }) => {
           data: { user },
         } = await clientAxios('/veterinarios/perfil', config);
 
-        setAuth(user);
+        setAuth(user); // 'user' será ahora 'auth' en el context
       } catch (error) {
         console.error(error.response.data.msg);
         setAuth({});
@@ -59,7 +60,5 @@ const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export { AuthProvider };
 
 export default AuthContext;

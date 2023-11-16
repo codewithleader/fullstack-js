@@ -1,17 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Alert from './Alert';
+import usePatients from '../hooks/usePatients';
 import { formatDate } from '../utils/formatDate';
 
 const Form = () => {
   const [name, setName] = useState('');
   const [owner, setOwner] = useState('');
   const [email, setEmail] = useState('');
-  const [discharge_date, setDischarge_date] = useState(formatDate(Date.now()));
+  const [discharge_date, setDischarge_date] = useState('');
   const [symptoms, setSymptoms] = useState('');
+  const [id, setId] = useState(null);
 
   const [isDisabled, setIsDisabled] = useState(false);
 
   const [alert, setAlert] = useState({});
+
+  const { patient, savePatient } = usePatients();
+
+  useEffect(() => {
+    if (patient?.name) {
+      setName(patient.name);
+      setOwner(patient.owner);
+      setEmail(patient.email);
+      setDischarge_date(formatDate(patient.discharge_date));
+      setSymptoms(patient.symptoms);
+      setId(patient.id);
+    }
+  }, [patient]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,19 +37,43 @@ const Form = () => {
         name.trim(),
         owner.trim(),
         email.trim(),
-        discharge_date.trim(),
+        discharge_date,
         symptoms.trim(),
       ].includes('')
     ) {
-      console.log(discharge_date);
       setAlert({ message: 'Todos los campos son obligatorios', error: true });
       setIsDisabled(false);
+      return;
     }
+
+    await savePatient({
+      name: name.trim(),
+      owner: owner.trim(),
+      email: email.trim(),
+      discharge_date: discharge_date.trim(),
+      symptoms: symptoms.trim(),
+      id,
+    });
+
+    // Limpiar formulario
+    setId(null);
+    setName('');
+    setOwner('');
+    setEmail('');
+    setDischarge_date('');
+    setSymptoms('');
+    setIsDisabled(false);
+
+    setAlert({ message: 'Guardado Exitosamente', error: false });
+
+    setTimeout(() => {
+      setAlert({});
+    }, 5000);
   };
 
   return (
     <>
-      <p className='text-lg text-center mb-10'>
+      <p className='text-xl mt-5 mb-10 text-center'>
         Añade tus pacientes y{' '}
         <span className='text-indigo-600 font-bold'>Administralos</span>
       </p>
@@ -114,7 +153,7 @@ const Form = () => {
             type='date'
             id='discharge_date'
             className='border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md'
-            value={formatDate(discharge_date)}
+            value={discharge_date}
             onChange={(e) => setDischarge_date(e.target.value)}
           />
         </div>
@@ -140,7 +179,7 @@ const Form = () => {
         <input
           disabled={isDisabled}
           type='submit'
-          value='Agregar Paciente'
+          value={id ? 'Guardar Cambios' : 'Agregar Paciente'}
           className='bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors disabled:bg-gray-400 disabled:hover:cursor-not-allowed'
         />
       </form>

@@ -12,7 +12,7 @@ const addPatient = async (req = request, res = response) => {
 
   try {
     const newPatient = await patient.save();
-    return res.json({ msg: 'OK', newPatient });
+    return res.json(newPatient);
   } catch (err) {
     console.error(err);
     const error = new Error('contacte al administrador');
@@ -29,7 +29,7 @@ const getPatients = async (req, res) => {
   // Option #2:
   const patients = await Patient.find().where('veterinarian').equals(user.id);
 
-  return res.json({ msg: 'OK', patients });
+  return res.json(patients);
 };
 
 const getPatient = async (req, res) => {
