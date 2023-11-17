@@ -53,7 +53,7 @@ veterinarianSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt); // Es preferible hash que hashSync para no bloquear la app.
 });
 
-// Method #1: Check Password
+// Method #1: Check Password: Verifica que la contraseña que ingresó el usuario haga match con el password hasheado en una instancia de 'veterinarian'
 veterinarianSchema.methods.checkPassword = async function (passwordForm) {
   return await bcrypt.compare(passwordForm, this.password); // return boolean
 };

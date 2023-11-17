@@ -13,10 +13,12 @@ export const PATH_VETERINARIAN = {
   veterinarians: {
     root: '/',
     profile: '/perfil',
+    update_profile: '/perfil/:id',
     verify: '/confirmar/:token', // Dynamic QueryParam
     login: '/login',
     reset_password: '/reset-password',
     new_password: '/new-password/:token', // Dynamic QueryParam
+    change_password: '/change-password'
   },
 };
 

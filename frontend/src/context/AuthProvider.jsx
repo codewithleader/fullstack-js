@@ -47,6 +47,69 @@ export const AuthProvider = ({ children }) => {
     setAuth({});
   };
 
+  const updateProfile = async (dataToUpdate) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      setAuth({});
+      setLoading(false);
+      return;
+    }
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const url = `/veterinarios/perfil/${dataToUpdate.id}`;
+      const { data: newProfile } = await clientAxios.put(
+        url,
+        dataToUpdate,
+        config
+      );
+
+      setAuth(newProfile);
+
+      return {
+        message: 'Actualizado Exitosamente',
+        error: false,
+      };
+    } catch (error) {
+      return {
+        message: error.response.data.msg,
+        error: true,
+      };
+    }
+  };
+
+  const changePassword = async (passwordOldAndNew) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      setAuth({});
+      setLoading(false);
+      return;
+    }
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const url = '/veterinarios/change-password';
+      const { data } = await clientAxios.put(url, passwordOldAndNew, config);
+      return { message: data.msg, error: false };
+    } catch (error) {
+      return { message: error.response.data.msg, error: true };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -54,6 +117,8 @@ export const AuthProvider = ({ children }) => {
         setAuth,
         loading,
         logout,
+        updateProfile,
+        changePassword,
       }}
     >
       {children}

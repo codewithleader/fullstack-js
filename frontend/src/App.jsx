@@ -9,6 +9,8 @@ import ResetPassword from './pages/ResetPassword';
 import NewPassword from './pages/NewPassword';
 import Login from './pages/login';
 import AdminPatients from './pages/AdminPatients';
+import EditProfile from './pages/EditProfile';
+import ChangePassword from './pages/changePassword';
 
 function App() {
   return (
@@ -29,7 +31,8 @@ function App() {
             {/* Rutas Privadas */}
             <Route path='/admin' element={<ProtectedRoutesLayout />}>
               <Route index element={<AdminPatients />} />
-              {/* <Route path='/otraruta' element={} /> */}
+              <Route path='perfil' element={<EditProfile />} />
+              <Route path='change-password' element={<ChangePassword />} />
             </Route>
           </Routes>
         </PatientsProvider>

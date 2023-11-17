@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import Veterinarian from '../models/Veterinarian.model.js';
 import generateJWT from '../helpers/generateJWT.js';
 import generateToken from '../helpers/generateToken.js';
@@ -44,6 +45,47 @@ const register = async (req, res) => {
 const profile = (req, res) => {
   const { session } = req;
   res.json({ user: session.user });
+};
+
+const updateProfile = async (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+
+  const veterinarian = await Veterinarian.findById(id).select('-token');
+
+  if (!veterinarian) {
+    const error = new Error('Hubo un error');
+    return res.status(400).json({ msg: error.message });
+  }
+
+  // Si intenta cambiar el email Verificar que no lo tenga otro usuario registrado
+  const { email } = body;
+  if (veterinarian.email !== email) {
+    const isEmailExists = await Veterinarian.findOne({ email });
+
+    if (isEmailExists) {
+      const error = new Error(
+        'Email ya registrado en base de datos por otro usuario'
+      );
+      return res.status(400).json({ msg: error.message });
+    }
+  }
+
+  try {
+    veterinarian.name = body.name || veterinarian.name;
+    veterinarian.web = body.web || '';
+    veterinarian.phone = body.phone || '';
+    veterinarian.email = body.email || veterinarian.email;
+
+    const veterinarianUpdated = await veterinarian.save();
+
+    return res.json(veterinarianUpdated);
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(400)
+      .json({ msg: 'Hubo un error, no se pudo actualizar' });
+  }
 };
 
 const verify = async (req, res) => {
@@ -165,6 +207,46 @@ const newPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const {
+    user: { id },
+  } = req.session;
+  const password = req.body;
+
+  const isSomeFieldEmpty = Object.values(password).some(
+    (field) => field.trim() === ''
+  );
+
+  if (isSomeFieldEmpty) {
+    const error = new Error(
+      'Contraseña Actual y Nueva Contraseña son obligatorias'
+    );
+    return res.status(400).json({ msg: error.message });
+  }
+
+  const veterinarian = await Veterinarian.findById(id);
+
+  const text = password.p_old; // Password sin hashear.
+
+  if (!(await veterinarian.checkPassword(text))) {
+    const error = new Error('Contraseña actual incorrecta');
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (password.p_new.length < 6) {
+    const error = new Error(
+      'La nueva contraseña debe tener al menos 6 caracteres'
+    );
+    return res.status(400).json({ msg: error.message });
+  }
+
+  veterinarian.password = password.p_new;
+
+  await veterinarian.save();
+
+  return res.json({ msg: 'Contraseña cambiada exitosamente' });
+};
+
 export {
   verify,
   profile,
@@ -173,4 +255,6 @@ export {
   newPassword,
   authenticate,
   resetPassword,
+  updateProfile,
+  changePassword,
 };

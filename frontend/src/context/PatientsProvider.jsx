@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import clientAxios from '../config/axios';
+import useAuth from '../hooks/useAuth';
 
 const PatientsContext = createContext();
 
@@ -7,6 +8,9 @@ const PatientsContext = createContext();
 export const PatientsProvider = ({ children }) => {
   const [patients, setPatients] = useState([]);
   const [patient, setPatient] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const { auth } = useAuth();
 
   useEffect(() => {
     const getPatients = async () => {
@@ -26,13 +30,15 @@ export const PatientsProvider = ({ children }) => {
         const { data } = await clientAxios('/pacientes', config);
 
         setPatients(data);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
 
     getPatients();
-  }, []);
+    console.log('useEffect: PatientProvider');
+  }, [auth]);
 
   const savePatient = async (patient) => {
     const token = localStorage.getItem('token');
@@ -105,8 +111,10 @@ export const PatientsProvider = ({ children }) => {
     <PatientsContext.Provider
       value={{
         //
+        loading,
         patient,
         patients,
+        setPatients,
         savePatient,
         setEdit,
         deletePatient,
