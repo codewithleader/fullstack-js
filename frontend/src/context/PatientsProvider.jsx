@@ -37,7 +37,6 @@ export const PatientsProvider = ({ children }) => {
     };
 
     getPatients();
-    console.log('useEffect: PatientProvider');
   }, [auth]);
 
   const savePatient = async (patient) => {
