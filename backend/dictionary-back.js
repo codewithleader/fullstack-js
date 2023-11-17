@@ -14,5 +14,6 @@ export const MAILTRAP_AUTH_USER = process.env.MAILTRAP_AUTH_USER;
 export const MAILTRAP_AUTH_PASS = process.env.MAILTRAP_AUTH_PASS;
 
 // FRONTEND data
-export const HOST_FRONTEND_DEV = process.env.HOST_FRONTEND_DEV;
-export const HOST_FRONTEND_PREVIEW = process.env.HOST_FRONTEND_PREVIEW;
+// export const HOST_FRONTEND_DEV = process.env.HOST_FRONTEND_DEV;
+// export const HOST_FRONTEND_PREVIEW = process.env.HOST_FRONTEND_PREVIEW;
+export const HOST_FRONTEND_PROD = process.env.HOST_FRONTEND_PROD;

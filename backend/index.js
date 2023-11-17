@@ -2,8 +2,9 @@ import express from 'express';
 import cors from 'cors';
 // Dictionary
 import {
-  HOST_FRONTEND_DEV,
-  HOST_FRONTEND_PREVIEW,
+  HOST_FRONTEND_PROD,
+  // HOST_FRONTEND_DEV,
+  // HOST_FRONTEND_PREVIEW,
   PORT,
 } from './dictionary-back.js';
 // Paths
@@ -24,7 +25,8 @@ app.use(express.json());
 connectDB();
 
 // Dominios permitidos en poliza de CORS
-const allowedWebDomains = [HOST_FRONTEND_DEV, HOST_FRONTEND_PREVIEW];
+// const allowedWebDomains = [HOST_FRONTEND_DEV, HOST_FRONTEND_PREVIEW];
+const allowedWebDomains = [HOST_FRONTEND_PROD];
 
 // Configuración para los CORS: Permitir solo los que esten el el array 'allowebWebDomains'
 const corsOptions = {
